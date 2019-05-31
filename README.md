@@ -10,12 +10,22 @@
 
 ---
 
-# 자료 다운로드
+### 자료 다운로드
 
 https://github.com/cardiomoon/processRWorkshop
  
 
 ---
+
+### 강의록
+
+1. 회귀에서 조절까지.pdf
+
+2. 회귀에서 매개모형으로.pdf
+
+3. processR 패키지 소개
+
+4. 조건부 프로세스 분석 예제.pdf
 
 
 ### 강의 진행에 필요한 사항
@@ -30,7 +40,7 @@ https://github.com/cardiomoon/processRWorkshop
 - RStudio 설치: 
     - https://www.rstudio.com/products/rstudio/download/#download
 
-필요한 R 패키지 : R console에서 다음 명령어 실행
+### 필요한 R 패키지 : R console에서 다음 명령어 실행
 
 ```
 install.packages("devtools")

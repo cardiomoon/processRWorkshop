@@ -2,7 +2,7 @@
 
 ### 초고완성: 2019년 5월 31일
 
-### 마지막 Update: 2019년 5월 31일 
+### 마지막 Update: 2019년 6월 1일 
 
 ### 강의: 문건웅(cardiomoon@gmail.com) 
 
@@ -46,6 +46,7 @@ https://github.com/cardiomoon/processRWorkshop
 install.packages("devtools")
 install.packages("tidyverse")
 install.packages("klaR")
+install.packages("DT")
 devtools::install_github("cardiomoon/predict3d")
 devtools::install_github("cardiomoon/processR")
 

@@ -1,0 +1,299 @@
+---
+title: "processR 패키지 소개"
+subtitle: "분석을 위한 lavaan syntax 만들기"
+author: "문건웅"
+date: "2019/6/1"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment=NA,message=FALSE,
+                      warning=FALSE,
+                      fig.height=6,fig.width=8, dpi=300,
+                      out.width="90%",fig.align="center"
+                      )
+```
+
+## 학습 목표 
+
+이번 강의를 들은 후에는 다음과 같은 개념적 모형의 통계적 모형을 그릴 수 있고 분석할 수 있는 lavaan syntax를 만들 수 있다.
+
+```{r,echo=FALSE}
+require(processR)
+labels=list(X="X",M="M",Y="Y",W="W",Z="Z",V="V")
+pmacroModel(27,labels=labels)
+```
+
+---
+
+## 통계적 모형
+
+```{r,echo=FALSE}
+labels=list(X="X",M="M",Y="Y",W="W",Z="Z",V="V")
+statisticalDiagram(27,labels=labels)
+```
+
+---
+## 분석을 위한 lavaan syntax
+
+```{r,echo=FALSE}
+vars=list(name=list(c("W","Z")),site=list("a"))
+moderator=list(name=c("W","V"),site=list("c","b"))
+model=tripleEquation(labels=labels,vars=vars,moderator=moderator)
+cat(model)
+```
+
+---
+
+## 기본 매개 모형
+
+- 기본 매개모형
+- PROCESS macro 4에 해당한다.
+
+```{r}
+labels=list(X="X",M="M",Y="Y")
+pmacroModel(4,labels=labels)
+```
+---
+
+
+## Statistical Diagram
+
+```{r}
+statisticalDiagram(4,labels=labels)
+```
+---
+
+## lavaan syntax 
+```{r}
+model=tripleEquation(X="X",M="M",Y="Y")
+cat(model)
+```
+---
+
+## 공변량이 있는 모형 
+
+* 공변량(covariate)는 interaction이 없는 다중회귀모형의 독립변수이다.
+
+* 단순매개모형에 두 개의 공변량이 추가된 모형
+
+  + C1: M과 Y를 종속변수로 하는 회귀모형에 공변량으로 추가 
+
+  +  C2: Y를 종속변수로 하는 회귀모형에 공변량으로 추가
+
+```{r,echo=FALSE,out.width="60%"}
+labels=list(X="X",M="M",Y="Y")
+covar=list(name=c("C1","C2"),site=list(c("M","Y"),"Y"))
+pmacroModel(4, labels=labels,covar=covar)
+```
+---
+
+## 개념적 모형
+
+```{r}
+labels=list(X="X",M="M",Y="Y")
+covar=list(name=c("C1","C2"),site=list(c("M","Y"),"Y"))
+pmacroModel(4, labels=labels,covar=covar)
+```
+
+---
+## 회귀식
+
+> $M = i_{M}+ aX + fC_1 + \varepsilon_{M}$
+
+> $Y = i_{Y}+ cX +  bM + g_1C_1 + g_2C_2 + \varepsilon_{Y}$
+
+---
+
+## 통계적 모형
+
+```{r}
+statisticalDiagram(4, labels=labels,rady=0.06, covar=covar)
+```
+---
+
+## lavaan syntax
+
+```{r}
+labels=list(X="X",M="M",Y="Y")
+model<-tripleEquation(labels=labels,covar=covar)
+cat(model)
+```
+
+---
+
+## 조절변수가 있는 모형
+
+- 조절변수(moderator)는 독립변수들이 상호작용하는 회귀모형을 만든다. 
+
+```{r}
+labels=list(X="X",M="M",Y="Y",W="W")
+pmacroModel(7, labels=labels)
+```
+---
+
+## "a" path의 회귀식
+
+> $M {\sim} X * W$
+
+위 식을 풀어쓰면 다음과 같다.
+
+> $M {\sim} X + W + XW$
+
+이 식을 회귀계수와 intercept, error가 있는 equation 으로 나타내면 다음과 같다.
+
+> $M = i_{M} + a_1X + a_2W + a_3XW + \varepsilon_{M}$
+
+---
+
+## lavaan syntax
+
+이 모형을 lavaan으로 분석하기 위한 syntax 는 다음과 같이 얻을 수 있다.
+
+```{r}
+moderator=list(name="W",site=list("a"))
+model=tripleEquation(labels=labels,moderator=moderator)
+cat(model)
+```
+
+
+---
+
+## 통계적 모형
+
+
+```{r}
+statisticalDiagram(7, labels=labels,rady=0.06)
+```
+
+
+--- 
+---
+
+## 여러 개의 조절변수가 있는 모형
+
+- PROCESS macro 22
+
+```{r}
+labels=list(X="X",M="M",Y="Y",W="W",V="V")
+pmacroModel(22, labels=labels)
+```
+
+---
+
+## 통계적 모형
+
+```{r}
+statisticalDiagram(22, labels=labels,rady=0.06) 
+```
+
+---
+
+
+이 모형의 회귀식은 다음과 같다.
+
+> $M = i_{M} + a_1X + a_2W + a_3XW + \varepsilon_{M}$
+
+> $Y = i_{Y} + c_1X + c_2W + c_3XW + b_1M + b_2V+ b_3MV  +\varepsilon_{Y}$
+
+---
+
+## lavaan syntax
+
+모형을 분석하기 위한 lavaan syntax는 다음과 같이 얻을 수 있다.
+
+```{r}
+labels=list(X="X",M="M",Y="Y")
+moderator=list(name=c("W","V"),site=list(c("a","c"),c("b")))
+model=tripleEquation(labels=labels,moderator=moderator)
+cat(model)
+```
+
+---
+
+## 조절된 조절이 있는 모형
+
+
+- PROCESS macro 모형 11
+
+```{r}
+pmacroModel(11, labels=labels)
+```
+
+---
+
+
+이 모형에 있는 조절된 조절은 회귀식으로 나타내면 triple interaction으로 표현할 수 있다.
+
+> $M {\sim} X*W*Z$
+
+이를 회귀식으로 나타내면 다음과 같다.
+
+> $M = i_{M} + a1X + a2W + a3Z + a4XW + a5XZ+ a6WZ + a7XWZ + \varepsilon_{M}$
+
+---
+
+이 모형을 분석하기 위한 lavaan syntax 는 다음과 같이 얻을 수 있다. 이때 triple interaction 이 있는 변수들은 W,Z 두개의 이름과 a,b,c의 path로 지정할 수 있다. 
+
+```{r}
+labels=list(X="X",M="M",Y="Y",W="W",Z="Z")
+vars = list(name=list(c("W","Z")),site=list("a"))
+model=tripleEquation(labels=labels,vars=vars)
+cat(model)
+```
+
+---
+
+## 분석을 위한 데이터 전처리
+
+- lavaan에서는 triple interaction을 인식하지 못한다. 
+- 회귀식에 있는 lavaan syntax에 a7\*X\*W\*Z를 입력하면 에러가 나고 분석이 되지 않는다.
+- tripleEquation()함수는 triple interaction 이 있는 경우 interaction0, interaction1,... 등으로 바꾸어 equation을 만들어 준다.
+- 분석하기 전 데이터에서 interaction0,...이라는 컬럼을 만들어주어야 한다
+
+```{r,eval=FALSE}
+data$interaction0 = data$X * data$W * data$Z 
+```
+
+---
+
+## 통계적 모형
+
+```{r}
+statisticalDiagram(11, labels=labels,rady=0.05)
+```
+
+---
+
+## 학습 목표 
+
+
+```{r,out.width="60%"}
+labels=list(X="X",M="M",Y="Y",W="W",Z="Z",V="V")
+pmacroModel(27,labels=labels)
+```
+
+---
+
+## 통계적 모형
+
+```{r}
+labels=list(X="X",M="M",Y="Y",W="W",Z="Z",V="V")
+statisticalDiagram(27,labels=labels)
+```
+
+---
+## 분석을 위한 lavaan syntax
+
+```{r}
+vars=list(name=list(c("W","Z")),site=list("a"))
+moderator=list(name=c("W","V"),site=list("c","b"))
+model=tripleEquation(labels=labels,vars=vars,moderator=moderator)
+cat(model)
+```

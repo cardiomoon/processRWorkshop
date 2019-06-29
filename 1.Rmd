@@ -1,0 +1,443 @@
+---
+title: "R 을 이용한 Conditional Process Analysis"
+subtitle: "I. 회귀에서 조절까지"
+author: "문건웅"
+date: "2019/6/1"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment=NA,message=FALSE,
+                      warning=FALSE,
+                      fig.height=4,fig.width=6, dpi=300,
+                      out.width="90%",fig.align="center"
+                      )
+```
+
+## 회귀분석
+
+--
+
+* 관찰된 연속형 변수들에 대해 두 변수 사이의 모형을 구한뒤 적합도를 측정해 내는 분석 방법
+
+--
+
+* 단순회귀분석(simple regression analysis) : 
+  + 하나의 종속변수와 하나의 독립변수 사이의 관계를 분석
+  
+* 다중회귀분석(multiple regression) :
+  + 하나의 종속변수와 여러 독립변수 사이의 관계를 분석
+
+--
+
+* 상호작용이 있는 회귀분석 :  
+  + 독립변수들 사이에 상호작용이 있는 경우
+  + 하나의 변수(조절변수)의 값이 변화함에 따라 다른 독립변수와 종속변수 사이의 회귀선의 기울기가 변하는데 이것을 조절효과라고 할 수 있다.
+
+
+---
+
+## 자동차의 연비
+
+.pull-left[
+
+### COOPER Mini
+
+```{r, out.height = "150px",out.width="227px",echo=FALSE}
+knitr::include_graphics("강의/mini.png")
+```
+
+- 공차중량 1,230kg
+- 배기량 1,496cc
+- 최대출력 116마력
+- 연비 16.5km/L
+]
+--
+.pull-right[
+
+### BENZ S600 MAYBACH
+
+```{r, out.height = "150px",echo=FALSE,out.width="90%"}
+knitr::include_graphics("강의/benz.jpg")
+```
+
+
+- 공차중량 2,345kg
+- 배기량 3,982cc
+- 최대출력 630마력
+- 연비 8.1km/L
+]
+
+---
+## 자동차의 연비와 공차중량의 관계
+
+* 데이터 mtcars (1974, Motor Trend)  
+
+```{r,echo=FALSE,message=FALSE}
+library(ggplot2)
+library(predict3d)
+
+theme_set(theme_bw(base_family = "NanumGothic"))
+options(ggPredict.family="NanumGothic")
+same_scale=function(p, as){
+    info=getAspectRatio(as)
+    p+xlim(c(info$xmin,info$xmax))+ylim(c(info$ymin,info$ymax))+
+        coord_fixed(ratio=info$ratio)
+}
+fit=lm(mpg ~ wt, data=mtcars)
+p<-ggPredict(fit,plot=FALSE,show.text=FALSE)$p
+p1<-ggplot(data=mtcars,aes(x=wt,y=mpg))+geom_point()
+p1<-same_scale(p1,as=p)
+p1
+
+```
+
+---
+## 두 변수의 관계를 직선으로 나타내보면? 
+
+```{r,echo=FALSE}
+fit=lm(mpg ~ wt, data=mtcars)
+res=as.data.frame(t(confint(fit)))
+names(res)=c("intercept","slope")
+res2=data.frame(intercept=fit$coef[1],slope=fit$coef[2])
+res=rbind(res,res2)
+res$label=c("C","A","B")
+p2=add_lines(p=p1,df=res)
+same_scale(p2,as=p)
+```
+
+---
+## 단순회귀분석
+
+```{r}
+fit=lm(mpg ~ wt, data=mtcars) 
+summary(fit)
+```
+
+---
+## 회귀분석 결과 요약
+
+회귀 분석의 결과 회귀선의 기울기는 `r round(fit$coef[2],2)`이고 y절편은 `r round(fit$coef[1],2)`이다. 즉, 회귀직선을 식으로 나타내면 다음과 같다.  
+
+> $mpg = -5.34wt + 37.29$
+
+위 공식을 일반화하여 종속변수를 $Y$,  독립변수를 $X$, 회귀선의 y절편을 $a$, 기울기를 $b$라고 하면 반응변수 $Y$의 추정치(yhat, $\hat{Y}$)는 다음과 같다. 
+
+> $\hat{Y} = a+bX$
+
+
+---
+
+## 산점도와 회귀직선
+
+```{r}
+require(predict3d)
+ggPredict(fit)
+```
+
+---
+## 회귀식과 오차
+
+```{r}
+ggPredict(fit,show.text=FALSE, show.error=TRUE)
+```
+
+---
+
+## 보통최소제곱회귀 
+
+반응변수 y의 i번째 관측치 $y_{i}$는 다음과 같이 나타낼 수 있다. 
+ 
+> $y_{i}= a+ bx_i+\varepsilon_i$
+
+여기서 $a+ b x_{i}$는 i번째 반응변수의 추정치 $\hat{y}_{i}$이므로 i번째 잔차 $\varepsilon_{i}$ 는 다음과 같다.
+
+> $\varepsilon_{i}=  y_{i}-\hat{y}_{i}$
+
+이들 잔차는 회귀선의 적합도를 나타내는데 잔차의 합은 0이 되므로 잔차의 제곱합을 사용하며 보통의 OLS(ordinary least square) 회귀에서는 잔차의 제곱합이 최소가 되도록 기울기와 y절편을 추정한다. 
+---
+
+## 단순회귀분석의 개념적모형
+
+R로 단순회귀분석을 할 경우 lm()함수의 formula로 Y ~ X 와 같이 사용하며 이를 개념적모형으로 나타내면 다음과 같다.
+
+> R formula: Y ~ X 
+
+```{r,out.width="60%"}
+require(processR)
+pmacroModel(0,radx=0.1,rady=0.07,ylim=c(0.1,0.6))
+```
+
+---
+## 단순회귀분석의 통계적 모형
+
+통계적모형으로 나타낼 때는 기울기를 같이 표시해준다. 이때 기울기를 b라고 하면 Y ~ b * X 로 표시할 수 있다. lavaan 패키지의 sem()함수를 이용하여 분석을 할 경우 이와 같이 기울기를 지정해주는 것이 좋다.
+
+> Model syntax: Y ~ b * X
+
+```{r}
+statisticalDiagram(0,radx=0.1,rady=0.07,,ylim=c(0.1,0.6))
+```
+
+
+---
+## 다중회귀분석 - 상호작용이 없는 경우
+
+- mtcars 데이터의 vs 변수는 engine이 “V-shape”인 경우 0, “straight”인 경우 1로 되어 있다.
+
+- 연비(mpg)의 설명변수로 공차중량(wt)과 함께 vs를 설명변수로 하는 회귀모형을 만든다
+
+```{r}
+mtcars$engine=factor(mtcars$vs,labels=c("V-shape","Straight"))
+fit1=lm(mpg ~ wt + engine, data = mtcars)
+summary(fit1)
+```
+---
+## 회귀모형 해석
+
+
+mpg를 y축으로 wt를 x 축으로 하는 회귀선의 기울기는 -4.44로 동일하나 y절편은 engine 에 따라 달라진다.
+
+* engine이 V-shape 인 경우 $intercept \approx 33.0$
+
+* engine이 Straight 인 경우 $intercept \approx 33.00042 + 3.1544 \approx 36.16$
+
+이 모형을 시각화하면 다음과 같다.
+
+
+
+---
+
+```{r}
+ggPredict(fit1)
+```
+---
+```{r,echo=TRUE,eval=FALSE}
+require(predict3d)
+predict3d(fit1,radius=0.5)
+```
+
+```{r,echo=FALSE,message=FALSE,fig.height=1.5,fig.width=1.5,out.width="50%"}
+require(predict3d)
+require(rgl)
+
+predict3d(fit1,radius=0.5)
+rglwidget(elementId="1")
+```
+
+
+---
+## 개념적모형
+
+상호작용이 없는 다중회귀분석의 경우 다음과 같은  R formula를 사용한다. 이때 C는 공변량(covariate)를 뜻한다.
+
+> R formula: Y ~ X + C
+
+```{r}
+pmacroModel(0,covar=list(name="C",site=list("Y")),ylim=c(0.1,0.6))
+```
+
+
+---
+## 통계적모형
+
+- 공변량의 회귀계수는 Y에 영향을 미치는 공변량의 경우  g1, g2,...로 붙인다.
+- M에 영향을 미치는 공변량의 경우  f1, f2,...로 붙인다.
+
+> Model syntax: Y ~ b \* X + g \* C
+
+```{r}
+statisticalDiagram(0,radx=0.06,rady=0.06,covar=list(name="C",site=list("Y")),ylim=c(0.1,0.6))
+```
+
+---
+
+## 상호작용이 있는 다중회귀모형(1)
+
+- 상호작용이 있는 경우 X:W의 형식으로 표기 
+- Y가 반응변수이고  X, W가 설명변수이고 X와 W의 상호작용이 있는 경우의 모형을 R formula로 나타내면 다음과 같다.
+
+> Y ~ X + W + X:W
+
+위의 formula를 간단하게 Y ~ X\*W 로도 쓸 수 있다. \*는 모든 가능한 상호작용을
+뜻한다.
+
+> X \* Z  = X + Z + X:Z
+
+> A \* B \* C = A + B + C + A:B + B:C + A:C + A:B:C
+
+---
+
+## 상호작용이 있는 다중회귀분석
+
+```{r}
+fit2=lm(mpg ~ wt*engine,data=mtcars)
+summary(fit2)
+```
+---
+
+## 회귀모형의 기울기와 y절편 
+
+이 모형에서 wt와 engine의 상호작용 wt:engine은 통계적으로 의미있다(p = 0.0236). 이 모형에서 wt를 설명변수로 engine를 조절변수의 역할을 한다고 생각해본다. mpg와 wt사이의 회귀식의 기울기와 y절편은 vs 의 값에 따라 달라진다.
+
+*  y 절편
+    + engine이 V-shaped 인 경우 $intercept \approx 29.5314$
+    + engine이 Straight 인 경우 $intercept \approx 29.5314 + 11.7667 \approx 41.3$
+
+* 기울기 
+    + engine이 V-shaped 인 경우 $slope \approx -3.5013$
+    + engine이 Straight 인 경우 $slope \approx -3.5013 - 2.9097 \approx 6.41$
+
+---
+```{r}
+ggPredict(fit2)
+```
+---
+```{r}
+predict3d(fit2,radius=0.5)
+```
+```{r,echo=FALSE,fig.height=1.5,fig.width=1.5,out.width="50%"}
+rglwidget(elementId="2")
+```
+---
+
+## 상호작용이 있는 다중회귀모형(2) 
+
+- 조절변수가 연속형변수인 경우
+
+```{r}
+fit3 = lm( mpg ~ wt*hp, data=mtcars)
+summary(fit3)
+```
+---
+##  기울기와 y절편 계산
+
+wt의 평균과 평균-표준편차, 평균+ 표준편차를 계산해보면 다음과 같다.
+
+```{r}
+mean(mtcars$hp, na.rm=TRUE) + c(-1,0,1)* sd(mtcars$hp, na.rm=TRUE)
+```
+*  y 절편
+    + hp가 78.12 인 경우 $intercept \approx 49.81 - 0.12 \times 78.12 \approx 40.43$
+    + hp가 146.69 인 경우 $intercept \approx 49.81 - 0.12\times 146.69 \approx 32.19$
+    + hp가 215.25 인 경우 $intercept \approx 49.81 - 0.12 \times 215.25 \approx 23.96$
+  
+*  기울기
+    + hp가 78.12 인 경우 $slope \approx -8.22 + 0.028 \times 78.12 \approx -6.04$
+    + hp가 146.69 인 경우 $slope \approx -8.22 + 0.028 \times 146.69 \approx -4.13$
+    + hp가 215.25 인 경우 $slope \approx -8.22 + 0.028 \times  215.25 \approx -2.22$
+
+---
+```{r}
+ggPredict(fit3)
+```
+---
+```{r}
+ggPredict(fit3,mode=3,colorn=50,show.text = FALSE)
+```
+---
+.pull-left[
+```{r}
+predict3d(fit3, show.error = TRUE)
+```
+```{r,echo=FALSE,fig.height=1.5,fig.width=1.5,out.width="50%"}
+rglwidget(elementId="3")
+```
+]
+--
+.pull-right[
+```{r}
+fit31=lm( mpg ~ wt+hp, data=mtcars)
+predict3d(fit31, show.error = TRUE)
+```
+```{r,echo=FALSE,fig.height=1.5,fig.width=1.5,out.width="50%"}
+rglwidget(elementId="31")
+```
+
+]
+---
+
+## 개념적모형
+
+상호작용이 있는 다중회귀분석은 Hayes의 PROCESS macro 모형 1에 해당한다. 다음과 같은  R formula를 사용한다.
+
+> R formula: Y ~ X * W
+
+개념적 모형은 다음과 같다.
+
+```{r}
+pmacroModel(1,radx=0.1,rady=0.07)
+```
+
+---
+## 통계적모형
+
+Model syntax는 다음과 같다.
+
+> Model syntax: Y ~ b1 \* X + b2 \* W + b3 \* X:W
+
+통계적 모형은 다음과 같다.
+
+```{r}
+statisticalDiagram(1,radx=0.1,rady=0.07)
+```
+---
+
+## 조절된 조절(moderated moderation)
+
+> A \* B \* C = A + B + C + A:B + B:C + A:C + A:B:C
+
+```{r}
+fit4=lm(mpg ~ wt * hp * engine,data=mtcars)
+summary(fit4)
+```
+
+---
+```{r}
+ggPredict(fit4,show.point=FALSE)
+```
+---
+```{r}
+predict3d(fit4, radius=4)
+```
+```{r,echo=FALSE,fig.height=2,fig.width=2,out.width="70%"}
+rglwidget(elementId="4")
+```
+---
+```{r}
+predict3d(fit4, radius=4,overlay=TRUE)
+```
+```{r,echo=FALSE,fig.height=2,fig.width=2,out.width="70%"}
+rglwidget(elementId="5")
+```
+---
+
+## 조절된 조절의 개념적모형
+
+설명변수가 3개 있고 모두 상호작용이 있는 모형은 조절된 조절이라고 할 수 있으며 Hayes의 PROCESS macro 모형 3에 해당한다.
+
+> R formula: Y ~ X \* W \* Z 
+
+개념적 모형은 다음과 같다.
+
+```{r}
+pmacroModel(3,radx=0.1,rady=0.07)
+```
+---
+
+## 조절된 조절의  통계적모형
+
+Model syntax는 다음과 같다.
+
+> Y ~ b1X + b2 W + b3 Z + b4 X:W + b5 X:Z + b6 W:Z + b7 X:W:Z
+
+```{r}
+statisticalDiagram(3)
+```
+

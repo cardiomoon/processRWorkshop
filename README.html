@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -268,7 +269,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -342,18 +342,6 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -379,34 +367,35 @@ $(document).ready(function () {
 
 <div id="processr-workshop" class="section level1">
 <h1>processR workshop</h1>
-<div id="-2019-5-31" class="section level3">
+<div id="section" class="section level3">
 <h3>초고완성: 2019년 5월 31일</h3>
 </div>
-<div id="-update-2019-6-19" class="section level3">
-<h3>마지막 Update: 2019년 6월 19일</h3>
+<div id="update-2019-12-6" class="section level3">
+<h3>마지막 Update: 2019년 12월 6일</h3>
 </div>
-<div id="-cardiomoongmail.com" class="section level3">
+<div id="cardiomoongmail.com" class="section level3">
 <h3>강의: 문건웅(<a href="mailto:cardiomoon@gmail.com" class="email">cardiomoon@gmail.com</a>)</h3>
 </div>
-<div class="section level3">
+<div id="section-1" class="section level3">
 <h3>내용:</h3>
 <hr />
 </div>
-<div id="-" class="section level3">
+<div id="section-2" class="section level3">
 <h3>자료 다운로드</h3>
 <p><a href="https://github.com/cardiomoon/processRWorkshop" class="uri">https://github.com/cardiomoon/processRWorkshop</a></p>
 <hr />
 </div>
-<div class="section level3">
+<div id="section-3" class="section level3">
 <h3>강의록</h3>
 <ol style="list-style-type: decimal">
 <li><p>회귀에서 조절까지.pdf</p></li>
 <li><p>회귀에서 매개모형으로.pdf</p></li>
 <li><p>processR 패키지 소개</p></li>
 <li><p>조건부 프로세스 분석 예제.pdf</p></li>
+<li><p>매개모형분석.pdf</p></li>
 </ol>
 </div>
-<div id="---" class="section level3">
+<div id="section-4" class="section level3">
 <h3>강의 진행에 필요한 사항</h3>
 <p>강의는 실습과 같이 진행됩니다. 강의를 들으시는 분들은 자신의 컴퓨터에 R과 RStudio가 설치되어 있어야 하며 RStudio에서 실습에 필요한 다음 패키지들을 설치하시기 바랍니다.</p>
 <ul>
@@ -421,15 +410,15 @@ $(document).ready(function () {
 </ul></li>
 </ul>
 </div>
-<div id="-r--r-console---" class="section level3">
+<div id="r--r-console---" class="section level3">
 <h3>필요한 R 패키지 : R console에서 다음 명령어 실행</h3>
 <pre><code>install.packages(&quot;devtools&quot;)
 install.packages(&quot;tidyverse&quot;)
 install.packages(&quot;klaR&quot;)
 install.packages(&quot;DT&quot;)
-devtools::install_github(&quot;cardiomoon/predict3d&quot;)
-devtools::install_github(&quot;cardiomoon/processR&quot;)
-</code></pre>
+install.packages(&quot;predict3d&quot;)
+install.packages(&quot;lavaan&quot;,repos=&quot;http://www.da.ugent.be&quot;,type=&quot;source&quot;)
+devtools::install_github(&quot;cardiomoon/processR&quot;)</code></pre>
 </div>
 </div>
 
@@ -450,6 +439,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

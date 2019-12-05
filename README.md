@@ -2,7 +2,7 @@
 
 ### 초고완성: 2019년 5월 31일
 
-### 마지막 Update: 2019년 6월 19일 
+### 마지막 Update: 2019년 12월 6일 
 
 ### 강의: 문건웅(cardiomoon@gmail.com) 
 
@@ -27,6 +27,8 @@ https://github.com/cardiomoon/processRWorkshop
 
 4. 조건부 프로세스 분석 예제.pdf
 
+5. 매개모형분석.pdf
+
 
 ### 강의 진행에 필요한 사항
 
@@ -47,7 +49,7 @@ install.packages("devtools")
 install.packages("tidyverse")
 install.packages("klaR")
 install.packages("DT")
-devtools::install_github("cardiomoon/predict3d")
+install.packages("predict3d")
+install.packages("lavaan",repos="http://www.da.ugent.be",type="source")
 devtools::install_github("cardiomoon/processR")
-
 ```
